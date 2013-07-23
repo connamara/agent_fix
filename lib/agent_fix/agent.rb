@@ -12,8 +12,9 @@ module AgentFIX
     def initialize name, connection_type
       @name = name
       @connection_type = connection_type
-
       @logged_on = false
+
+      @logger = Java::org.slf4j.LoggerFactory.getLogger("AgentFIX.Agent")
     end
 
     def onCreate(sessionId)
@@ -21,7 +22,7 @@ module AgentFIX
     end
 
     def onLogon(sessionId)
-      puts "#{@name} onLogon: #{sessionId.to_s}"
+      @logger.debug "#{@name} onLogon: #{sessionId.to_s}"
 
       lock.synchronize do
         @logged_on = true
@@ -29,7 +30,7 @@ module AgentFIX
     end
 
     def onLogout(sessionId)
-      puts "#{@name} onLogout: #{sessionId.to_s}"
+      @logger.debug "#{@name} onLogout: #{sessionId.to_s}"
 
       lock.synchronize do
         @logged_on = false
@@ -37,20 +38,20 @@ module AgentFIX
     end
 
     def toApp(message, sessionId) 
-      puts "#{@name} toApp #{sessionId.to_s}: #{message.to_s.gsub("","|")}"
+      @logger.debug "#{@name} toApp #{sessionId.to_s}: #{message.to_s.gsub("","|")}"
     end
 
     def fromApp(message, sessionId)
-      puts "#{@name} fromApp #{sessionId.to_s}: #{message.to_s.gsub("","|")}"
+      @logger.debug "#{@name} fromApp #{sessionId.to_s}: #{message.to_s.gsub("","|")}"
       add_msg(message)
     end
 
     def toAdmin(message, sessionId)
-      puts "#{@name} toAdmin #{sessionId.to_s}: #{message.to_s.gsub("","|")}"
+      @logger.debug "#{@name} toAdmin #{sessionId.to_s}: #{message.to_s.gsub("","|")}"
     end
 
     def fromAdmin(message, sessionId)
-      puts "* fromAdmin #{sessionId.to_s}: #{message.to_s.gsub("","|")}"
+      @logger.debug "#{@name} fromAdmin #{sessionId.to_s}: #{message.to_s.gsub("","|")}"
       add_msg(message)
     end
 
@@ -103,6 +104,8 @@ module AgentFIX
         session_settings << "[SESSION]\n"
         @session.each { |k,v| session_settings << "#{k}=#{v}\n"}
       end
+
+      @logger.info "Settings for #{@name}: #{session_settings}"
 
       @storeFactory = quickfix.MemoryStoreFactory.new()
       @messageFactory = quickfix.DefaultMessageFactory.new()
