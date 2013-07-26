@@ -11,6 +11,10 @@ end
 
 World(FIXMessageCache)
 
+Before do
+  @scopes = Hash.new
+end
+
 def anticipate_fix
   sleeping(AgentFIX.cucumber_sleep_seconds).seconds.between_tries.failing_after(AgentFIX.cucumber_retries).tries do
     yield
@@ -32,10 +36,26 @@ Given the following fix message:
   end
 end
 
+Then(/^I should receive (\d+)(?: FIX|fix)? messages(?: (?:on|over) FIX)? with agent "(.*?)"$/) do |count, agent|
+  throw "Unknown agent #{agent}" unless AgentFIX.agents_hash.has_key?(agent.to_sym)
+  last_scope_size = @scopes[agent.to_sym].nil? ? 0 : @scopes[agent.to_sym]
+
+  anticipate_fix do
+    @messages=AgentFIX.agents_hash[agent.to_sym].app_messages_received.slice(last_scope_size, last_scope_size + count.to_i)
+    @scopes[agent.to_sym] = @messages.length # store consumed count
+    
+    @messages.length.should ==(count.to_i)
+  end
+end
+
+Then(/^I should receive a(?: FIX|fix)? message(?: (?:on|over) FIX)? with agent "(.*?)"$/) do |agent|
+  steps %Q{Then I should receive 1 messages with agent "#{agent}"}
+end
+
 Then(/^I should receive (\d+) messages on FIX of type "(.*?)" with agent "(.*?)"$/) do |count, type, agent|
   throw "Unknown agent #{agent}" unless AgentFIX.agents_hash.has_key?(agent.to_sym)
   anticipate_fix do
-    @messages=AgentFIX.agents_hash[agent.to_sym].messages_received.find_all do |msg|
+    @messages=AgentFIX.agents_hash[agent.to_sym].app_messages_received.find_all do |msg|
        msg.header.get_string(35) == type
     end
 
@@ -68,7 +88,7 @@ Then(/^I should( not)? receive a (?:message|request|response) on (?:FIX|fix|Fix)
   throw "Unknown agent #{agent}" unless AgentFIX.agents_hash.has_key?(agent.to_sym)
 
   anticipate_fix do
-    @message=AgentFIX.agents_hash[agent.to_sym].messages_received.last
+    @message=AgentFIX.agents_hash[agent.to_sym].app_messages_received.last
 
     if negative
       break if @message.nil?

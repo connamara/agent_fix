@@ -43,6 +43,7 @@ module AgentFIX
 
     def fromApp(message, sessionId)
       @logger.debug "#{@name} fromApp #{sessionId.to_s}: #{message.to_s.gsub("","|")}"
+      add_app_msg(message)
       add_msg(message)
     end
 
@@ -52,6 +53,7 @@ module AgentFIX
 
     def fromAdmin(message, sessionId)
       @logger.debug "#{@name} fromAdmin #{sessionId.to_s}: #{message.to_s.gsub("","|")}"
+      add_admin_msg(message)
       add_msg(message)
     end
 
@@ -71,6 +73,8 @@ module AgentFIX
 
     def reset
       clear
+      clear_admin
+      clear_app
     end
 
     def start
