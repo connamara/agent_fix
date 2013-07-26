@@ -1,0 +1,30 @@
+Feature: A simple new order sequence to demonstrate agent_fix
+
+  Background:
+    Given my agents are logged on
+
+  Scenario:
+    When I send the following FIX message from agent "my_initiator": 
+    """
+    8=FIX.4.235=D11=hello21=155=IBM54=140=260=20090101-17:13:06.684
+    """
+
+    Then I should receive a message on FIX of type "NewOrderSingle" with agent "my_acceptor"
+    When I send the following FIX messages from agent "my_acceptor":
+    """
+    8=FIX.4.235=811=hello17=12337=abc39=A150=A151=020=06=014=021=155=IBM54=140=260=20090101-17:13:06.684
+    8=FIX.4.235=811=hello17=12337=abc39=0150=0151=020=06=014=021=155=IBM54=140=260=20090101-17:13:06.684
+    """
+
+    Then I should receive 2 messages on FIX of type "8" with agent "my_initiator"
+    And the 1st message should have the following:
+      | ClOrdID     | "hello"       |
+      | OrderID     | "abc"         |
+      | Symbol      | "IBM"         |
+      | OrdStatus   | "PENDING_NEW" |
+
+    And the 2nd message should have the following:
+      | ClOrdID     | "hello"       |
+      | OrderID     | "abc"         |
+      | Symbol      | "IBM"         |
+      | OrdStatus   | "NEW"         |

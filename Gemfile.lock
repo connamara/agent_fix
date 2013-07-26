@@ -1,3 +1,11 @@
+GIT
+  remote: git@github.com:connamara/fix_spec.git
+  revision: d646f62cbd615dc7e7694117c368fa521420697c
+  specs:
+    fix_spec (0.0.0)
+      json_spec (~> 1.1.0)
+      quickfix
+
 GEM
   remote: http://rubygems.org/
   remote: http://gem.connamara.com/
@@ -37,6 +45,9 @@ GEM
       rake
       rdoc
     json (1.8.0-java)
+    json_spec (1.1.1)
+      multi_json (~> 1.0)
+      rspec (~> 2.0)
     jwt (0.1.8)
       multi_json (>= 1.5)
     multi_json (1.7.7)
@@ -72,6 +83,7 @@ DEPENDENCIES
   anticipate
   bundler (~> 1.1)
   cucumber
+  fix_spec!
   jeweler (~> 1.8.4)
   quickfix
   rspec
