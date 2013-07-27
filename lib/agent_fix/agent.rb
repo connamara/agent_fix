@@ -4,7 +4,6 @@ require 'agent_fix/message_cache'
 module AgentFIX
   class Agent
     include quickfix.Application
-    include MessageCache
 
     attr_reader :name, :connection_type
     attr_accessor :default, :session
@@ -13,6 +12,8 @@ module AgentFIX
       @name = name
       @connection_type = connection_type
       @logged_on = false
+      @all_messages = MessageCache.new
+      @app_messages = MessageCache.new
 
       @logger = Java::org.slf4j.LoggerFactory.getLogger("AgentFIX.Agent")
     end
@@ -43,8 +44,9 @@ module AgentFIX
 
     def fromApp(message, sessionId)
       @logger.debug "#{@name} fromApp #{sessionId.to_s}: #{message.to_s.gsub("","|")}"
-      add_app_msg(message)
-      add_msg(message)
+
+      @all_messages.add_msg(message)
+      @app_messages.add_msg(message)
     end
 
     def toAdmin(message, sessionId)
@@ -53,8 +55,7 @@ module AgentFIX
 
     def fromAdmin(message, sessionId)
       @logger.debug "#{@name} fromAdmin #{sessionId.to_s}: #{message.to_s.gsub("","|")}"
-      add_admin_msg(message)
-      add_msg(message)
+      @all_messages.add_msg(message)
     end
 
     def loggedOn?
@@ -72,9 +73,7 @@ module AgentFIX
     end
 
     def reset
-      clear
-      clear_admin
-      clear_app
+      clear!
     end
 
     def start
@@ -92,9 +91,24 @@ module AgentFIX
       @connector.stop
     end
 
+    def messages_received opts={}
+      opts[:from_all]||=false
+
+      if opts[:from_all]
+        @all_messages.messages_received
+      else
+        @app_messages.messages_received
+      end
+    end
 
 
     protected
+
+    def clear!
+      @all_messages.clear!
+      @app_messages.clear!
+    end
+
     def parse_settings
       session_settings = "[DEFAULT]\n"
       session_settings << "ConnectionType=#{@connection_type}\n"

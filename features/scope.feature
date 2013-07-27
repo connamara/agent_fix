@@ -23,7 +23,8 @@ Feature: A demonstration of scoping capabilities in agent_fix
       | Symbol      | "IBM"         |
       | OrdStatus   | "PENDING_NEW" |
 
-    And the 2nd message should have the following:
+    When I inspect the 2nd message
+    Then the FIX message should have the following:
       | ClOrdID     | "hello"       |
       | OrderID     | "abc"         |
       | Symbol      | "IBM"         |
@@ -35,8 +36,12 @@ Feature: A demonstration of scoping capabilities in agent_fix
     """
     
     Then I should receive a message over FIX with agent "my_initiator"
-    And the 1st message should have the following:
+    And the FIX message should have the following:
       | ClOrdID     | "hello"       |
       | OrderID     | "abc"         |
       | Symbol      | "IBM"         |
       | OrdStatus   | "CANCELED"    |
+
+    When I sleep 5 seconds
+    Then I should not receive any more messages with agent "my_initiator"
+    And I should not receive any more messages with agent "my_initiator"

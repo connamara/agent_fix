@@ -79,6 +79,4 @@ Setup
 Test
 ----
 
-    bundle exec rspec
     env JAVA_OPTS=-XX:MaxPermSize=2048m bundle exec rake cucumber
-
