@@ -127,28 +127,28 @@ end
 Then(/^the(?: FIX|fix)? messages should include(?: a message with)? the following:$/) do |table|
   @message_scope.should_not be_nil, "No message scope defined"
   
-  # convert table into hash & strip quotes around values
-  expected = Hash.new
-  table.raw.each {|key, value| expected[key] = value.chomp('"').reverse.chomp('"').reverse }
+  table_raw ="" 
+  table.raw.each do |path, val|
+    table_raw << "|#{path}|#{val}|\n"
+  end
   
   found = false
+  index = 1
   @message_scope.each do |m|
-    scoped_msg = FIXSpec::Helpers.message_to_hash(m)
-    found |= expected.included_in?(scoped_msg)
+    @message = m
+    begin
+      steps %Q{
+When I inspect the #{index}th FIX message
+Then the FIX message should have the following:
+#{table_raw}
+      }
+      found = true
+    rescue Exception => e
+      # eat
+    end
+    index += 1
   end
   
   found.should be_true, "Message not included in FIX messages"
 
-end
-
-class Hash
-  def included_in?(another)
-    # another has to have all my keys...
-    return false unless (keys - another.keys).empty?
-    # ..and have the same value for every my key
-    each do |k,v|
-      return false unless v == another[k]
-    end
-    true
-  end
 end
