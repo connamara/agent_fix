@@ -123,3 +123,20 @@ Then the FIX message should have the following:
 #{table_raw}
   }
 end
+
+Then(/^the(?: FIX|fix)? messages should include(?: a message with)? the following:$/) do |table|
+  @message_scope.should_not be_nil, "No message scope defined"
+  
+  # convert table into hash & strip quotes around values
+  expected = Hash.new
+  table.raw.each {|key, value| expected[key] = value.chomp('"').reverse.chomp('"').reverse }
+  
+  found = false
+  @message_scope.each do |m|
+    scoped_msg = FIXSpec::Helpers.message_to_hash(m)
+    found |= (expected.to_a - scoped_msg.to_a).empty?
+  end
+  
+  found.should be_true, "Message not included in FIX messages"
+
+end
