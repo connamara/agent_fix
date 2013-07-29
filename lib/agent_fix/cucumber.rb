@@ -134,9 +134,21 @@ Then(/^the(?: FIX|fix)? messages should include(?: a message with)? the followin
   found = false
   @message_scope.each do |m|
     scoped_msg = FIXSpec::Helpers.message_to_hash(m)
-    found |= (expected.to_a - scoped_msg.to_a).empty?
+    found |= expected.included_in?(scoped_msg)
   end
   
   found.should be_true, "Message not included in FIX messages"
 
+end
+
+class Hash
+  def included_in?(another)
+    # another has to have all my keys...
+    return false unless (keys - another.keys).empty?
+    # ..and have the same value for every my key
+    each do |k,v|
+      return false unless v == another[k]
+    end
+    true
+  end
 end
