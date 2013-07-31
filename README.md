@@ -157,6 +157,10 @@ And the FIX messages should include a message with the following:
 
 The new scope, containing one message, will contain the last FIX message `OrdStatus=CANCELED`, and not `OrdStatus=NEW` since that was consumed by the previous scope.  The second inclusion check for `OrdStatus=NEW` would then fail, since the received message was defined in a previous inspection scope.
 
+### Identifying scoped FIX messages in failed scenarios
+
+In a failed Agent FIX scenario, if a scope & agent were ever defined, the last defined scope & agent will print their sent & received messages, colored according to the last defined scope.  All sent messages will be colored in green, received messages prior to the current scope will be colored in green, and the current scope when the scenario failed will have its messages colored in red.
+
 Setup
 -----
 
