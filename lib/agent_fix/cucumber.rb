@@ -63,15 +63,15 @@ Then(/^I should receive (exactly )?(\d+)(?: FIX|fix)? messages(?: (?:on|over) FI
 
   last_index = last_agent_index(agent)
   anticipate_fix do
-    messages = AgentFIX.agents_hash[agent.to_sym].messages_received
+    messages = AgentFIX.agents_hash[agent.to_sym].messages_received(AgentFIX::message_scope_level)
 
     if exact
       (messages.length - last_index).should be == count, "Expected exactly #{count} messages, but got #{messages.length - last_index}"
     else
       (messages.length - last_index).should be >= count, "Expected #{count} messages, but got #{messages.length - last_index}"
     end
-
-    @message_scope=AgentFIX.agents_hash[agent.to_sym].messages_received.slice(last_index, last_index + count.to_i)
+    
+    @message_scope=messages.slice(last_index, last_index + count.to_i)
 
     unless type.nil?
       @message_scope.each do |msg|
@@ -84,7 +84,7 @@ Then(/^I should receive (exactly )?(\d+)(?: FIX|fix)? messages(?: (?:on|over) FI
 
   #if we only requested one message for the scope, inspect that message
   if count == 1
-    @message = AgentFIX.agents_hash[agent.to_sym].messages_received[last_index]
+    @message = AgentFIX.agents_hash[agent.to_sym].messages_received(AgentFIX::message_scope_level)[last_index]
   else
     @message = nil
   end

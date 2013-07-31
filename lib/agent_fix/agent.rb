@@ -44,7 +44,7 @@ module AgentFIX
 
     def fromApp(message, sessionId)
       @logger.debug "#{@name} fromApp #{sessionId.to_s}: #{message.to_s.gsub("","|")}"
-
+      
       @all_messages.add_msg(message)
       @app_messages.add_msg(message)
     end
@@ -93,7 +93,7 @@ module AgentFIX
 
     def messages_received opts={}
       opts[:from_all]||=false
-
+      
       if opts[:from_all]
         @all_messages.messages_received
       else

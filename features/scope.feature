@@ -46,7 +46,7 @@ Feature: A demonstration of scoping capabilities in agent_fix
     Then I should not receive any more messages with agent "my_initiator"
     And I should not receive any more messages with agent "my_initiator"
 
-  Scenario: scope inclusion
+  Scenario: scope inclusion for app messages only (default)
     When I send the following FIX message from agent "my_initiator": 
     """
     8=FIX.4.235=D11=hello21=155=IBM54=140=260=20090101-17:13:06.684
