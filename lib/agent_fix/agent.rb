@@ -14,6 +14,7 @@ module AgentFIX
       @logged_on = false
       @all_messages = MessageCache.new
       @app_messages = MessageCache.new
+      @sent_messages = MessageCache.new
 
       @logger = Java::org.slf4j.LoggerFactory.getLogger("AgentFIX.Agent")
     end
@@ -40,6 +41,7 @@ module AgentFIX
 
     def toApp(message, sessionId) 
       @logger.debug "#{@name} toApp #{sessionId.to_s}: #{message.to_s.gsub("","|")}"
+      @sent_messages.add_msg(message)
     end
 
     def fromApp(message, sessionId)
@@ -51,6 +53,7 @@ module AgentFIX
 
     def toAdmin(message, sessionId)
       @logger.debug "#{@name} toAdmin #{sessionId.to_s}: #{message.to_s.gsub("","|")}"
+      @sent_messages.add_msg(message)
     end
 
     def fromAdmin(message, sessionId)
@@ -101,6 +104,9 @@ module AgentFIX
       end
     end
 
+    def messages_sent
+      @sent_messages.messages_received
+    end
 
     protected
 
