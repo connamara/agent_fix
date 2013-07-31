@@ -119,6 +119,7 @@ Scope inclusion is scope inspection without regard to order.  Say the agent rece
 8=FIX.4.2|35=8|11=hello|17=123|37=abc|39=A|150=A|151=0|20=0|6=0|14=0|21=1|55=IBM|54=1|40=2|60=20090101-17:13:06.684|
 8=FIX.4.2|35=8|11=hello|17=123|37=abc|39=0|150=0|151=0|20=0|6=0|14=0|21=1|55=IBM|54=1|40=2|60=20090101-17:13:06.684|
 8=FIX.4.2|35=8|11=hello|17=123|37=abc|39=4|150=A|151=0|20=0|6=0|14=0|21=1|55=IBM|54=1|40=2|60=20090101-17:13:06.684|
+8=FIX.4.2|35=8|11=hello|17=123|37=abc|39=2|150=A|151=0|20=0|6=0|14=0|21=1|55=IBM|54=1|40=2|60=20090101-17:13:06.684|
 ```
 
 Define your scope:
@@ -138,8 +139,23 @@ And the FIX messages should include a message with the following:
   | OrdStatus   | "NEW"         |
 ```
 
-Message #2 has `39=0` (`OrdStatus=NEW`), and matches the cucumber step, so this step will pass.  If the message was first or third in the scope, the step would still pass.
+Message #2 has `OrdStatus=NEW`, and matches the cucumber step, so this step will pass.  If the message was first or third in the scope, the step would still pass.  If, however, another scope was then defined:
 
+```cucumber
+Then I should receive a message on FIX with agent "my_initiator"
+```
+
+And an inclusion check was performed:
+
+```cucumber
+And the FIX messages should include a message with the following:
+  | ClOrdID     | "hello"       |
+  | OrderID     | "abc"         |
+  | Symbol      | "IBM"         |
+  | OrdStatus   | "NEW"         |
+```
+
+The new scope, containing one message, will contain the last FIX message `OrdStatus=CANCELED`, and not `OrdStatus=NEW` since that was consumed by the previous scope.  The second inclusion check for `OrdStatus=NEW` would then fail, since the received message was defined in a previous inspection scope.
 
 Setup
 -----
