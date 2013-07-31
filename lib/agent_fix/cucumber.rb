@@ -31,6 +31,18 @@ module FIXMessageCache
   def last_agent
     @last_agent ||= nil
   end
+  
+  def save_scope_size agent, size
+    agent_scopes[agent.to_sym] = size
+  end
+  
+  def last_scope_size agent
+    agent_scopes[agent.to_sym]
+  end
+  
+  def agent_scopes
+    @agent_scopes ||= Hash.new(0)
+  end
 end
 
 World(FIXMessageCache)
@@ -75,7 +87,6 @@ class String
 end
 
 Before do
-  puts "RESET AGENT INDEXES"
   reset_agent_indexes
 end
 
@@ -87,21 +98,23 @@ After do |scenario|
     STDERR.puts "\nMessages for ".yellow + last_agent.to_s.white + ": ".yellow
     
     last_index = last_agent_index(last_agent)
+    scope_size = last_scope_size(last_agent)
     
-    received_messages = agent.messages_received({:from_all => true})
-    scoped_messages = received_messages.slice(last_index, received_messages.count - last_index)
+    all_messages = agent.messages_received({:from_all => true})
+    received_messages = agent.messages_received(AgentFIX::message_scope_level)
+    scoped_messages = received_messages.slice(last_index.to_i - scope_size.to_i, last_index)
     
     agent.messages_sent.each do |msg|
-      STDERR.puts "\tout\t" + msg.to_s.gsub!(/\001/, '|').green
+      STDERR.puts "\tsent\t" + msg.to_s.gsub!(/\001/, '|').green
     end
     
     STDERR.puts
     
-    received_messages.each do |msg|
+    all_messages.each do |msg|
       if !scoped_messages.include?(msg)
-        STDERR.puts "\tin\t" + msg.to_s.gsub!(/\001/, '|').green
+        STDERR.puts "\trecv\t" + msg.to_s.gsub!(/\001/, '|').green
       else
-        STDERR.puts "\tin\t" + msg.to_s.gsub!(/\001/, '|').red
+        STDERR.puts "\trecv\t" + msg.to_s.gsub!(/\001/, '|').red
       end
     end
       
@@ -136,7 +149,8 @@ end
 
 Then(/^I should receive (exactly )?(\d+)(?: FIX|fix)? messages(?: (?:on|over) FIX)?(?: of type "(.*?)")? with agent "(.*?)"$/) do |exact, count, type, agent|
   check_agent agent
-
+  save_scope_size agent, count
+  
   count = count.to_i
 
   last_index = last_agent_index(agent)
