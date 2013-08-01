@@ -43,6 +43,10 @@ module FIXMessageCache
   def agent_scopes
     @agent_scopes ||= Hash.new(0)
   end
+
+	def reset_agent_scopes
+		@agent_scopes = nil
+	end
 end
 
 World(FIXMessageCache)
@@ -88,6 +92,7 @@ end
 
 Before do
   reset_agent_indexes
+	reset_agent_scopes
 end
 
 After do |scenario|

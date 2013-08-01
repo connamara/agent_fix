@@ -113,6 +113,7 @@ module AgentFIX
     def clear!
       @all_messages.clear!
       @app_messages.clear!
+			@sent_messages.clear!
     end
 
     def parse_settings
