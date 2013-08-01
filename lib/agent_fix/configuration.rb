@@ -6,6 +6,14 @@ module AgentFIX
       FileLogPath: "fixlog",
       HeartBtInt: 60
     }
+    
+    def message_scope_level=(scope)
+      @message_scope_level = scope
+    end
+    
+    def message_scope_level
+      @message_scope_level ||= {:from_all => false}
+    end
 
     def cucumber_sleep_seconds=(secs)
       @cucumber_sleep_seconds = secs
