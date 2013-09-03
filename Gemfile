@@ -1,15 +1,13 @@
-source "http://rubygems.org"
-source "http://gem.connamara.com/"
+source "https://rubygems.org"
 
-gem "quickfix"
+gem "quickfix-jruby", "~>1.5.4"
 gem "anticipate"
-gem "cucumber"
-git "git@github.com:connamara/fix_spec.git" do
-  gem "fix_spec"
-end
+gem "cucumber", "~> 1.3"
+gem "fix_spec", "~> 0.1"
+#gem "slf4j"
 
 group :development do
-  gem "bundler", "~> 1.1"
-  gem "jeweler", "~> 1.8.4"
-  gem "rspec"
+  gem "jeweler", "~> 1.8"
+  gem "rspec", "~> 2.14"
+  gem "rake", "~> 10.1"
 end

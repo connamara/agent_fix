@@ -12,9 +12,10 @@ module AgentFIX
       @name = name
       @connection_type = connection_type
       @logged_on = false
-      @all_messages = MessageCache.new
-      @app_messages = MessageCache.new
-      @sent_messages = MessageCache.new
+
+      @all_received_messages = MessageCache.new
+      @app_received_messages = MessageCache.new
+      @all_sent_messages = MessageCache.new
 
       @logger = Java::org.slf4j.LoggerFactory.getLogger("AgentFIX.Agent")
     end
@@ -41,24 +42,24 @@ module AgentFIX
 
     def toApp(message, sessionId) 
       @logger.debug "#{@name} toApp #{sessionId.to_s}: #{message.to_s.gsub("","|")}"
-      @sent_messages.add_msg(message)
+      @all_sent_messages.add_message(message)
     end
 
     def fromApp(message, sessionId)
       @logger.debug "#{@name} fromApp #{sessionId.to_s}: #{message.to_s.gsub("","|")}"
       
-      @all_messages.add_msg(message)
-      @app_messages.add_msg(message)
+      @all_received_messages.add_message(message)
+      @app_received_messages.add_message(message)
     end
 
     def toAdmin(message, sessionId)
       @logger.debug "#{@name} toAdmin #{sessionId.to_s}: #{message.to_s.gsub("","|")}"
-      @sent_messages.add_msg(message)
+      @all_sent_messages.add_message(message)
     end
 
     def fromAdmin(message, sessionId)
       @logger.debug "#{@name} fromAdmin #{sessionId.to_s}: #{message.to_s.gsub("","|")}"
-      @all_messages.add_msg(message)
+      @all_received_messages.add_message(message)
     end
 
     def loggedOn?
@@ -92,28 +93,31 @@ module AgentFIX
 
     def stop
       @connector.stop
+      clear!
     end
 
-    def messages_received opts={}
-      opts[:from_all]||=false
-      
-      if opts[:from_all]
-        @all_messages.messages_received
+    def messages_received opts = {}
+      if opts[:app_only].nil? 
+        opts[:app_only] = AgentFIX::include_session_level?
+      end
+
+      if opts[:app_only]
+        @app_received_messages.messages
       else
-        @app_messages.messages_received
+        @all_received_messages.messages
       end
     end
 
     def messages_sent
-      @sent_messages.messages_received
+      @all_sent_messages.messages
     end
 
     protected
 
     def clear!
-      @all_messages.clear!
-      @app_messages.clear!
-			@sent_messages.clear!
+      @all_received_messages.clear!
+      @app_received_messages.clear!
+			@all_sent_messages.clear!
     end
 
     def parse_settings

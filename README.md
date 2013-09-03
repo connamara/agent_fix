@@ -1,26 +1,21 @@
-agent_fix
+agent\_fix
 ========
 
-Agent framework designed for FIX applications
+Agent framework designed for FIX applications using [quickfix-jruby](https://github.com/connamara/quickfix-jruby).
 
-Dependencies
-------------
+Usage
+-----
 
-This project was tested using `jruby-1.7.4`.
+### Agent Types
 
-Agent Types
------------
+#### Initiator
+* Connects to an address hosting a fix session (FIX Client)
 
-### Initiator
+#### Acceptor
+* Binds on an address to host a fix session (FIX Server)
 
-* Binds on an address
 
-### Acceptor
-
-* Connects to an address
-
-Agent Definition
-----------------
+### Agent Definition
 
 Inside your project, declare agents and connection information inside ```config/fix_agents.rb``` like so:
 
@@ -53,13 +48,13 @@ require 'agent_fix'
 You can define a data dictionary using FIX spec:
 
 ```ruby
-FIXSpec::data_dictionary= quickfix.DataDictionary.new "path/to/FIX42.xml"
+FIXSpec.data_dictionary= quickfix.DataDictionary.new "path/to/FIX42.xml"
 ```
 
 Configure inspection behavior to use combined admin & app messages (default is app-only):
 
 ```ruby
-AgentFIX::message_scope_level = {:from_all => true}
+AgentFIX.include_session_level = true
 ```
 
 ### Getting Started
@@ -161,12 +156,55 @@ The new scope, containing one message, will contain the last FIX message `OrdSta
 
 In a failed Agent FIX scenario, if a scope & agent were ever defined, the last defined scope & agent will print their sent & received messages, colored according to the last defined scope.  All sent messages will be colored in green, received messages prior to the current scope will be colored in green, and the current scope when the scenario failed will have its messages colored in red.
 
-Setup
------
+### More
 
-    bundle install
+Check out [features](features/) to see all the ways you can use agent_fix.
 
-Test
-----
+Install
+-------
 
-    env JAVA_OPTS=-XX:MaxPermSize=2048m bundle exec rake cucumber
+```shell
+gem install agent_fix
+```
+
+or add the following to Gemfile:
+```ruby
+gem 'agent_fix'
+```
+and run `bundle install` from your shell.
+
+
+More Information
+----------------
+
+* [Rubygems](https://rubygems.org/gems/agent_fix)
+* [Issues](https://github.com/connamara/agent_fix/issues)
+* [Connamara Systems](http://connamara.com)
+
+Contributing
+------------
+
+Please see the [contribution guidelines](CONTRIBUTION_GUIDELINES.md).
+
+Credits
+-------
+
+Contributers:
+
+* Chris Busbey
+* Matt Lane
+
+![Connamara Systems](http://www.connamara.com/images/home-connamara-logo-lg.png)
+
+agent_fix is maintained and funded by [Connamara Systems, llc](http://connamara.com).
+
+The names and logos for Connamara Systems are trademarks of Connamara Systems, llc.
+
+Licensing
+---------
+
+agent_fix is Copyright © 2013 Connamara Systems, llc. 
+
+This software is available under the GPL and a commercial license.  Please see the [LICENSE](LICENSE.txt) file for the terms specified by the GPL license.  The commercial license offers more flexible licensing terms compared to the GPL, and includes support services.  [Contact us](mailto:info@connamara.com) for more information on the Connamara commercial license, what it enables, and how you can start commercial development with it.
+
+This product includes software developed by quickfixengine.org ([http://www.quickfixengine.org/](http://www.quickfixengine.org/)). Please see the [QuickFIX Software LICENSE](QUICKFIX_LICENSE.txt) for the terms specified by the QuickFIX Software License.

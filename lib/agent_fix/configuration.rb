@@ -7,12 +7,12 @@ module AgentFIX
       HeartBtInt: 60
     }
     
-    def message_scope_level=(scope)
-      @message_scope_level = scope
+    def include_session_level=(opt)
+      @include_session_level = opt
     end
     
-    def message_scope_level
-      @message_scope_level ||= {:from_all => false}
+    def include_session_level?
+      @include_session_level ||=false
     end
 
     def cucumber_sleep_seconds=(secs)
@@ -37,6 +37,10 @@ module AgentFIX
 
     def session_defaults
       @session_defaults ||= REASONABLE_SESSION_DEFAULTS
+    end
+
+    def reset_config
+      instance_variables.each{|ivar| remove_instance_variable(ivar) }
     end
   end
 end

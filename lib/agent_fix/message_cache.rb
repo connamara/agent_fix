@@ -1,32 +1,32 @@
 require 'thread'
 module AgentFIX
   class MessageCache
-    def messages_received
+    def messages
       lock.synchronize do
-        return messages.dup
+        return msgs.dup
       end
     end
     
     def pop
       lock.synchronize do
-        return messages.pop
+        return msgs.pop
       end
     end
     
-    def add_msg msg
+    def add_message msg
       lock.synchronize do
-        messages << msg
+        msgs << msg
       end
     end
     
     def clear!
       lock.synchronize do
-        messages.clear
+        msgs.clear
       end
     end
     
   private
-    def messages
+    def msgs
       @messages||=[]
     end
     
