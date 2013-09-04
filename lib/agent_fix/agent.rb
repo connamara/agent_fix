@@ -95,7 +95,7 @@ module AgentFIX
       clear_state!
     end
 
-    def all_messages opts={}
+    def history opts={}
       opts[:since] ||= 0
       opts[:received_only] ||= false
       opts[:include_session]||= AgentFIX::include_session_level?
@@ -116,7 +116,7 @@ module AgentFIX
     end
 
     def messages_received opts = {}
-      all_messages opts.merge(:received_only=>true)
+      history opts.merge(:received_only=>true)
     end
 
     protected

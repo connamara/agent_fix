@@ -40,7 +40,7 @@ end
 def print_results agent
   STDERR.puts "\nMessages for ".yellow + agent.name.to_s.white + ": ".yellow
   
-  agent.all_messages(:include_session=>true).each do |msg|
+  agent.history(:include_session=>true).each do |msg|
     if msg[:sent]
       STDERR.puts "\tsent >>\t #{msg[:message].to_s.gsub!(/\001/, '|')}".green
     else
