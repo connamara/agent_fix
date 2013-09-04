@@ -27,6 +27,8 @@ module AgentFIX
     return if agent_files_loaded.include? path
     agent_files_loaded << path
     load path
+
+    agents.each {|a| a.init}
   end
 
   def define_agent(agent, &blk)
@@ -57,6 +59,12 @@ module AgentFIX
 
   def reset
     agents.each {|a| a.reset}
+  end
+
+  def hard_reset
+    stop
+    sleep 0.5
+    start
   end
 
   def agents_hash

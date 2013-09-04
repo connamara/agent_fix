@@ -7,12 +7,6 @@ module AgentFIX
       end
     end
     
-    def pop
-      lock.synchronize do
-        return msgs.pop
-      end
-    end
-    
     def add_message msg
       lock.synchronize do
         msgs << msg

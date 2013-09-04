@@ -8,18 +8,15 @@ require 'anticipate'
 
 Around('@inspect_all') do |scenario, block|
   old_scope = AgentFIX.include_session_level?
-  AgentFIX::include_session_level = false
+  AgentFIX::include_session_level = true
 
-  #hard reset, forces logon
-  AgentFIX.stop
-  sleep(1)
-  AgentFIX.start
+  #hard reset, forces logout/logon
+  AgentFIX.hard_reset
   block.call
   AgentFIX::include_session_level = old_scope
 end
 
-Before do
-  sleep(0.5)
+Before('~@inspect_all') do
   AgentFIX.reset
 end
 

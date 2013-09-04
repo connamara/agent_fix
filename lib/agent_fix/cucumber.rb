@@ -4,67 +4,25 @@ require 'fix_spec/builder'
 require 'fix_spec/cucumber'
 
 module FIXMessageCache
+  # accessor for fix_spec
   def last_fix
     @message
   end
 
-  def agent_index
-    @agent_indexes ||= Hash.new(0)
-  end
+  def recall_agent agent
+    agent = AgentFIX.agents_hash[agent.to_sym]
+    throw "Unknown agent #{agent}" if agent.nil?
 
-  def reset_agent_indexes
-    @agent_indexes = nil
+    agent
   end
-
-  def save_agent_index agent, index
-    agent_index[agent.to_sym] = index
-  end
-
-  def last_agent_index agent
-    agent_index[agent.to_sym]
-  end
-  
-  def save_last_agent agent
-    @last_agent = agent
-  end
-  
-  def last_agent
-    @last_agent ||= nil
-  end
-  
-  def save_scope_size agent, size
-    agent_scopes[agent.to_sym] = size
-  end
-  
-  def last_scope_size agent
-    agent_scopes[agent.to_sym]
-  end
-  
-  def agent_scopes
-    @agent_scopes ||= Hash.new(0)
-  end
-
-	def reset_agent_scopes
-		@agent_scopes = nil
-	end
 end
 
 World(FIXMessageCache)
-
-Before do
-  reset_agent_indexes
-	reset_agent_scopes
-end
 
 def anticipate_fix
   sleeping(AgentFIX.cucumber_sleep_seconds).seconds.between_tries.failing_after(AgentFIX.cucumber_retries).tries do
     yield
   end
-end
-
-def check_agent agent
-  throw "Unknown agent #{agent}" unless AgentFIX.agents_hash.has_key?(agent.to_sym)
-  save_last_agent agent
 end
 
 When(/^I send the following FIX message(?:s)? from agent "(.*?)":$/) do |agent, fix|
@@ -83,39 +41,41 @@ Given the following fix message:
 end
 
 Then(/^I should receive (exactly )?(\d+)(?: FIX|fix)? messages(?: (?:on|over) FIX)?(?: of type "(.*?)")? with agent "(.*?)"$/) do |exact, count, type, agent|
-  check_agent agent
-  save_scope_size agent, count
-  
+  @agent = recall_agent(agent)
   count = count.to_i
 
-  last_index = last_agent_index(agent)
+  scope = []
   anticipate_fix do
-    messages = AgentFIX.agents_hash[agent.to_sym].messages_received
+    messages = @agent.messages_received :since=>@agent.bookmark
 
     if exact
-      (messages.length - last_index).should be == count, "Expected exactly #{count} messages, but got #{messages.length - last_index}"
+      (messages.length).should be == count, "Expected exactly #{count} messages, but got #{messages.length}"
     else
-      (messages.length - last_index).should be >= count, "Expected #{count} messages, but got #{messages.length - last_index}"
+      (messages.length).should be >= count, "Expected #{count} messages, but got #{messages.length}"
     end
     
-    @message_scope=messages.slice(last_index, last_index + count.to_i)
+    scope=messages.slice(0, count)
 
     unless type.nil?
       unless FIXSpec::data_dictionary.nil?
         type = FIXSpec::data_dictionary.get_msg_type(type)
       end
 
-      @message_scope.each do |msg|
-        msg.header.get_string(35).should == type
+      @scope.each do |msg|
+        msg[:message].header.get_string(35).should == type
       end
     end
   end
 
-  save_agent_index agent, last_index + count
+  unless scope.empty?
+    @agent.bookmark = scope.last[:index]+1
+  end
+
+  @message_scope=scope.collect {|m| m[:message]}
 
   #if we only requested one message for the scope, inspect that message
   if count == 1
-    @message = AgentFIX.agents_hash[agent.to_sym].messages_received[last_index]
+    @message = @message_scope.first
   else
     @message = nil
   end
@@ -164,6 +124,7 @@ Then(/^the(?: FIX|fix)? messages should include(?: a message with)? the followin
   end
   
   found = false
+  error_accum = ""
   index = 1
   @message_scope.each do |m|
     @message = m
@@ -175,11 +136,11 @@ Then the FIX message should have the following:
       }
       found = true
     rescue Exception => e
-      # eat
+      error_accum << "\n#{m.to_s.gsub!(/\001/, '|')}\n #{e}"
     end
     index += 1
   end
   
-  found.should be_true, "Message not included in FIX messages"
+  found.should be_true, "Message not included in FIX messages\n #{error_accum}"
 
 end

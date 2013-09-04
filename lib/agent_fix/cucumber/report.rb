@@ -37,32 +37,43 @@ class String
   end
 end
 
-After do |scenario|
-  if scenario.failed? and !last_agent.nil?
+def print_results agent
+  STDERR.puts "\nMessages for ".yellow + agent.name.to_s.white + ": ".yellow
   
-    agent = AgentFIX.agents_hash[last_agent.to_sym]
-  
-    STDERR.puts "\nMessages for ".yellow + last_agent.to_s.white + ": ".yellow
-    
-    last_index = last_agent_index(last_agent)
-    scope_size = last_scope_size(last_agent)
-    
-    all_messages = agent.messages_received(:app_only=>false)
-    received_messages = agent.messages_received
-    scoped_messages = received_messages.slice(last_index.to_i - scope_size.to_i, last_index) || []
-    
-    agent.messages_sent.each do |msg|
-      STDERR.puts "\tsent\t" + msg.to_s.gsub!(/\001/, '|').green
-    end
-    
-    STDERR.puts
-    
-    all_messages.each do |msg|
-      if !scoped_messages.include?(msg)
-        STDERR.puts "\trecv\t" + msg.to_s.gsub!(/\001/, '|').green
+  agent.all_messages(:include_session=>true).each do |msg|
+    if msg[:sent]
+      STDERR.puts "\tsent >>\t #{msg[:message].to_s.gsub!(/\001/, '|')}".green
+    else
+      outbound = "\trecv <<\t #{msg[:message].to_s.gsub!(/\001/, '|')}"
+
+      if @message!=nil and msg[:message] == @message
+        STDERR.puts outbound.red
       else
-        STDERR.puts "\trecv\t" + msg.to_s.gsub!(/\001/, '|').red
+        if msg[:index] >= @agent.bookmark
+          STDERR.puts outbound.blue
+        else
+
+          if @message_scope.include? msg[:message]
+            STDERR.puts outbound.pink
+          else
+            STDERR.puts outbound.green
+          end
+        end
       end
+    end
+  end
+end
+
+After do |scenario|
+  if scenario.failed? then
+    #last selected agent gets priority
+    unless @agent.nil?
+      print_results(@agent)
+    end
+
+    AgentFIX.agents_hash.values.each do |agent|
+      next if agent == @agent
+      print_results(agent)
     end
   end
 end

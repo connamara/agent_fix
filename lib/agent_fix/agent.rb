@@ -8,16 +8,24 @@ module AgentFIX
     attr_reader :name, :connection_type
     attr_accessor :default, :session
 
+    attr_accessor :bookmark
+
     def initialize name, connection_type
       @name = name
       @connection_type = connection_type
       @logged_on = false
-
-      @all_received_messages = MessageCache.new
-      @app_received_messages = MessageCache.new
-      @all_sent_messages = MessageCache.new
-
+      @bookmark = 0
+      @all_messages = MessageCache.new
       @logger = Java::org.slf4j.LoggerFactory.getLogger("AgentFIX.Agent")
+    end
+
+    def init
+      parse_settings
+      @connector = case @connection_type
+        when :acceptor then quickfix.SocketAcceptor.new(self, @storeFactory, @settings, @logFactory, @messageFactory)
+        when :initiator then quickfix.SocketInitiator.new(self, @storeFactory, @settings, @logFactory, @messageFactory)
+        else nil
+      end
     end
 
     def onCreate(sessionId)
@@ -42,24 +50,22 @@ module AgentFIX
 
     def toApp(message, sessionId) 
       @logger.debug "#{@name} toApp #{sessionId.to_s}: #{message.to_s.gsub("","|")}"
-      @all_sent_messages.add_message(message)
+      @all_messages.add_message(message:message,sent:true,admin:false)
     end
 
     def fromApp(message, sessionId)
       @logger.debug "#{@name} fromApp #{sessionId.to_s}: #{message.to_s.gsub("","|")}"
-      
-      @all_received_messages.add_message(message)
-      @app_received_messages.add_message(message)
+      @all_messages.add_message(message:message,sent:false,admin:false)
     end
 
     def toAdmin(message, sessionId)
       @logger.debug "#{@name} toAdmin #{sessionId.to_s}: #{message.to_s.gsub("","|")}"
-      @all_sent_messages.add_message(message)
+      @all_messages.add_message(message:message,sent:true,admin:true)
     end
 
     def fromAdmin(message, sessionId)
       @logger.debug "#{@name} fromAdmin #{sessionId.to_s}: #{message.to_s.gsub("","|")}"
-      @all_received_messages.add_message(message)
+      @all_messages.add_message(message:message,sent:false,admin:true)
     end
 
     def loggedOn?
@@ -77,47 +83,47 @@ module AgentFIX
     end
 
     def reset
-      clear!
+      clear_state!
     end
 
     def start
-      parse_settings
-      @connector = case @connection_type
-        when :acceptor then quickfix.SocketAcceptor.new(self, @storeFactory, @settings, @logFactory, @messageFactory)
-        when :initiator then quickfix.SocketInitiator.new(self, @storeFactory, @settings, @logFactory, @messageFactory)
-        else nil
-      end
-
       @connector.start
     end
 
     def stop
       @connector.stop
-      clear!
+      clear_state!
+    end
+
+    def all_messages opts={}
+      opts[:since] ||= 0
+      opts[:received_only] ||= false
+      opts[:include_session]||= AgentFIX::include_session_level?
+
+      indexed_msgs = []
+      @all_messages.messages.each_with_index { |m,i| indexed_msgs << m.merge(index:i) }
+      indexed_msgs = indexed_msgs.slice(opts[:since], indexed_msgs.length)
+
+      if opts[:received_only]
+        indexed_msgs = indexed_msgs.find_all {|m| !m[:sent]}
+      end
+
+      unless opts[:include_session]
+        indexed_msgs = indexed_msgs.find_all {|m| !m[:admin]}
+      end
+
+      indexed_msgs
     end
 
     def messages_received opts = {}
-      if opts[:app_only].nil? 
-        opts[:app_only] = AgentFIX::include_session_level?
-      end
-
-      if opts[:app_only]
-        @app_received_messages.messages
-      else
-        @all_received_messages.messages
-      end
-    end
-
-    def messages_sent
-      @all_sent_messages.messages
+      all_messages opts.merge(:received_only=>true)
     end
 
     protected
 
-    def clear!
-      @all_received_messages.clear!
-      @app_received_messages.clear!
-			@all_sent_messages.clear!
+    def clear_state!
+      @all_messages.clear!
+      @bookmark = 0
     end
 
     def parse_settings
