@@ -1,0 +1,12 @@
+language: ruby
+rvm:
+- jruby-18mode
+- jruby-19mode
+- jruby-head
+
+env:
+- JAVA_OPTS="-XX:MaxPermSize=2048m -Djava.util.logging.config.file=config/logging.properties"
+
+matrix:
+  allow_failures:
+    - rvm: jruby-18mode

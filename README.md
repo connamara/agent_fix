@@ -1,5 +1,5 @@
-agent\_fix
-========
+agent\_fix [![Build Status](https://travis-ci.org/connamara/agent_fix.png)](https://travis-ci.org/connamara/agent_fix)
+==========
 
 Agent framework designed for FIX applications using [quickfix-jruby](https://github.com/connamara/quickfix-jruby).
 
