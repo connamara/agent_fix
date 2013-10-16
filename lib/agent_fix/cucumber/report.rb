@@ -49,7 +49,7 @@ def print_results agent
       if @message!=nil and msg[:message] == @message
         STDERR.puts outbound.red
       else
-        if msg[:index] >= @agent.bookmark
+        if msg[:index] >= agent.bookmark
           STDERR.puts outbound.blue
         else
 
