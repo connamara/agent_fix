@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = "agent_fix"
-  s.version = "0.1.0"
+  s.version = "0.1.1"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Matt Lane", "Chris Busbey"]
-  s.date = "2013-09-04"
+  s.date = "2013-10-16"
   s.description = "Interact with FIX connections to send, receive, and inspect messages in cucumber"
   s.email = "info@connamara.com"
   s.extra_rdoc_files = [
