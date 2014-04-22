@@ -53,8 +53,12 @@ module AgentFIX
     end
   end
 
-  def stop
-    agents.each {|a| a.stop}
+  #stops all agents. 
+  #use boolean opt :force=>true to wait for logout completion
+  def stop opts={}
+    opts[:force]||=false
+
+    agents.each {|a| a.stop opts[:force]}
   end
 
   def reset

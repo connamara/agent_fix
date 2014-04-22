@@ -90,8 +90,8 @@ module AgentFIX
       @connector.start
     end
 
-    def stop
-      @connector.stop
+    def stop force=false
+      @connector.stop force
       clear_state!
     end
 
