@@ -2,7 +2,7 @@ language: ruby
 rvm:
 - jruby-18mode
 - jruby-19mode
-- jruby-head
+- jruby
 
 env:
 - JAVA_OPTS="-XX:MaxPermSize=2048m -Djava.util.logging.config.file=config/logging.properties"
