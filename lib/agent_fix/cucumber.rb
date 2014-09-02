@@ -61,7 +61,7 @@ Then(/^I should receive (exactly )?(\d+)(?: FIX|fix)? messages(?: (?:on|over) FI
         type = FIXSpec::data_dictionary.get_msg_type(type)
       end
 
-      @scope.each do |msg|
+      scope.each do |msg|
         msg[:message].header.get_string(35).should == type
       end
     end
