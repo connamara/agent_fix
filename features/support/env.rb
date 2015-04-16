@@ -20,7 +20,14 @@ Before('~@inspect_all') do
   AgentFIX.reset
 end
 
-FIXSpec::data_dictionary= quickfix.DataDictionary.new "features/support/FIX42.xml"
+Before('~@fix50') do
+  FIXSpec::data_dictionary = quickfix.DataDictionary.new "features/support/FIX42.xml"
+end
+
+Before('@fix50') do
+  FIXSpec::application_data_dictionary = FIXSpec::DataDictionary.new "features/support/FIX50SP1.xml"
+  FIXSpec::session_data_dictionary = FIXSpec::DataDictionary.new "features/support/FIXT11.xml"
+end
 
 World(Anticipate)
 

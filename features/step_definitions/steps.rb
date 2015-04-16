@@ -6,12 +6,12 @@ Given(/^the agents are running$/) do
   #nop
 end
 
-
-
 Given(/^my agents are logged on$/) do
   sleeping(AgentFIX.cucumber_sleep_seconds).seconds.between_tries.failing_after(AgentFIX.cucumber_retries).tries do
     AgentFIX.agents_hash[:my_acceptor].loggedOn?.should be_true
     AgentFIX.agents_hash[:my_initiator].loggedOn?.should be_true
+    AgentFIX.agents_hash[:my_fix50_acceptor].loggedOn?.should be_true
+    AgentFIX.agents_hash[:my_fix50_initiator].loggedOn?.should be_true
   end
 end
 
