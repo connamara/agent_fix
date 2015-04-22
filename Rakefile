@@ -31,9 +31,8 @@ Jeweler::Tasks.new do |gem|
   gem.summary = %Q{Agent framework for FIX messages}
   gem.description = %Q{Interact with FIX connections to send, receive, and inspect messages in cucumber}
   gem.email = "info@connamara.com"
-  gem.authors = ["Matt Lane","Chris Busbey"]
+  gem.authors = ["Matt Lane","Chris Busbey","Mike Gatny"]
   # dependencies defined in Gemfile
 end
 
 Jeweler::RubygemsDotOrgTasks.new
-
