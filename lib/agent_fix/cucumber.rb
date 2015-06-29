@@ -49,9 +49,9 @@ Then(/^I should receive (exactly )?(\d+)(?: FIX|fix)? messages(?: (?:on|over) FI
     messages = @agent.messages_received :since=>@agent.bookmark
 
     if exact
-      (messages.length).should be == count, "Expected exactly #{count} messages, but got #{messages.length}"
+      expect(messages.length).to eq(count), "Expected exactly #{count} messages, but got #{messages.length}"
     else
-      (messages.length).should be >= count, "Expected #{count} messages, but got #{messages.length}"
+      expect(messages.length).to be >= count, "Expected #{count} messages, but got #{messages.length}"
     end
     
     scope=messages.slice(0, count)
@@ -62,7 +62,7 @@ Then(/^I should receive (exactly )?(\d+)(?: FIX|fix)? messages(?: (?:on|over) FI
       end
 
       scope.each do |msg|
-        msg[:message].header.get_string(35).should == type
+        expect(msg[:message].header.get_string(35)).to eq(type)
       end
     end
   end
@@ -96,8 +96,8 @@ end
 When(/^I inspect the (\d+)(?:.*?)(?: FIX| fix)? message$/) do |index|
   index = index.to_i-1
 
-  @message_scope.should_not be_nil, "No message scope defined"
-  @message_scope.length.should be >index, "There are only #{@message_scope.length} messages in the scope"
+  expect(@message_scope).not_to be_nil, "No message scope defined"
+  expect(@message_scope.length).to be >index, "There are only #{@message_scope.length} messages in the scope"
   @message = @message_scope[index]
 end
 
@@ -116,7 +116,7 @@ Then the FIX message should have the following:
 end
 
 Then(/^the(?: FIX|fix)? messages should include(?: a message with)? the following:$/) do |table|
-  @message_scope.should_not be_nil, "No message scope defined"
+  expect(@message_scope).not_to be_nil, "No message scope defined"
   
   table_raw ="" 
   table.raw.each do |path, val|
@@ -141,6 +141,5 @@ Then the FIX message should have the following:
     index += 1
   end
   
-  found.should be_true, "Message not included in FIX messages\n #{error_accum}"
-
+  expect(found).to be(true), "Message not included in FIX messages\n #{error_accum}"
 end

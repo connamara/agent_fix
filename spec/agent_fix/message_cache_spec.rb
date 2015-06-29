@@ -8,9 +8,9 @@ describe AgentFIX::MessageCache do
     cache.add_message "3"
 
     msgs = cache.messages
-    msgs.should == ["1","2","3"]
+    expect(msgs).to eq(["1","2","3"])
 
     cache.clear!
-    msgs.should == ["1","2","3"]
+    expect(msgs).to eq(["1","2","3"])
   end
 end
