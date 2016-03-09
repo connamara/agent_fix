@@ -39,10 +39,18 @@ Usage
 
 ### Configuration
 
-In order to use Agent FIX, in your `env.rb` you must:
+In order to use Agent FIX, you must:
 
 ```ruby
 require 'agent_fix'
+```
+
+To use with cucumber, you must:
+
+```ruby
+# env.rb
+require 'agent_fix/cucumber'
+require 'agent_fix/cucumber/report'
 ```
 
 You can define a data dictionary using FIX spec:
