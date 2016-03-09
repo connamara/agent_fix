@@ -1,6 +1,6 @@
 require File.expand_path("../../agent_fix", __FILE__)
 
-require 'fix_spec/builder'
+require 'fix_spec'
 require 'fix_spec/cucumber'
 
 module FIXMessageCache
