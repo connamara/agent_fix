@@ -1,8 +1,9 @@
 $: << File.expand_path("../../../lib", __FILE__)
 
+require 'fix_spec'
+require 'fix_spec/cucumber'
 require 'agent_fix/cucumber'
 require 'agent_fix/cucumber/report'
-require 'fix_spec/cucumber'
 require 'rspec'
 require 'anticipate'
 
