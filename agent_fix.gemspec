@@ -50,25 +50,36 @@ Gem::Specification.new do |s|
   ]
   s.homepage = "http://github.com/connamara/agent_fix"
   s.licenses = ["GPL"]
-  s.rubygems_version = "2.4.5"
+  s.rubygems_version = "2.4.8"
   s.summary = "Agent framework for FIX messages"
 
   if s.respond_to? :specification_version then
     s.specification_version = 4
 
     if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.2.0') then
-      s.add_runtime_dependency(%q<agent_fix>, [">= 0"])
+      s.add_runtime_dependency(%q<quickfix-jruby>, ["~> 1.6.0"])
+      s.add_runtime_dependency(%q<anticipate>, [">= 0"])
+      s.add_runtime_dependency(%q<cucumber>, ["~> 1.3"])
+      s.add_runtime_dependency(%q<fix_spec>, ["~> 1.0.0"])
+      s.add_runtime_dependency(%q<rspec>, ["~> 3.0"])
       s.add_development_dependency(%q<jeweler>, ["~> 1.8.8"])
       s.add_development_dependency(%q<rake>, ["~> 10.1"])
     else
-      s.add_dependency(%q<agent_fix>, [">= 0"])
+      s.add_dependency(%q<quickfix-jruby>, ["~> 1.6.0"])
+      s.add_dependency(%q<anticipate>, [">= 0"])
+      s.add_dependency(%q<cucumber>, ["~> 1.3"])
+      s.add_dependency(%q<fix_spec>, ["~> 1.0.0"])
+      s.add_dependency(%q<rspec>, ["~> 3.0"])
       s.add_dependency(%q<jeweler>, ["~> 1.8.8"])
       s.add_dependency(%q<rake>, ["~> 10.1"])
     end
   else
-    s.add_dependency(%q<agent_fix>, [">= 0"])
+    s.add_dependency(%q<quickfix-jruby>, ["~> 1.6.0"])
+    s.add_dependency(%q<anticipate>, [">= 0"])
+    s.add_dependency(%q<cucumber>, ["~> 1.3"])
+    s.add_dependency(%q<fix_spec>, ["~> 1.0.0"])
+    s.add_dependency(%q<rspec>, ["~> 3.0"])
     s.add_dependency(%q<jeweler>, ["~> 1.8.8"])
     s.add_dependency(%q<rake>, ["~> 10.1"])
   end
 end
-
