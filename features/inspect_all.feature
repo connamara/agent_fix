@@ -12,7 +12,7 @@ Scenario Outline: Basic TestRequest
   When "<sender>" sends a TestRequest with TestReqID "<req>"
   And I sleep 5 seconds
   Then "<receiver>" should receive a TestRequest with TestReqID "<req>"
-  And "<sender>" should receive a HeartBeat with TestReqID "<req>"
+  And "<sender>" should receive a Heartbeat with TestReqID "<req>"
 
   When I send the following FIX message from agent "<sender>": 
   """
@@ -39,7 +39,7 @@ Scenario Outline: Basic TestRequest
   When "<sender>" sends a TestRequest with TestReqID "<req>"
   And I sleep 5 seconds
   Then "<receiver>" should receive a TestRequest with TestReqID "<req>"
-  And "<sender>" should receive a HeartBeat with TestReqID "<req>"
+  And "<sender>" should receive a Heartbeat with TestReqID "<req>"
 
   When I send the following FIX message from agent "<sender>": 
   """

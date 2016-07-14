@@ -23,7 +23,7 @@ When(/^"(.*?)" sends a TestRequest with TestReqID "(.*)"$/) do |agent, value|
   AgentFIX.agents_hash[agent.to_sym].sendToTarget(msg)
 end
 
-Then(/^"(.*?)" should receive a (TestRequest|HeartBeat) with TestReqID "(.*?)"$/) do |agent, messageType, value|
+Then(/^"(.*?)" should receive a (TestRequest|Heartbeat) with TestReqID "(.*?)"$/) do |agent, messageType, value|
   steps %Q{Then I should receive a FIX message of type "#{messageType}" with agent "#{agent}"}
 
   reqID = quickfix.field.TestReqID.new
