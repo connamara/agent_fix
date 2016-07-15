@@ -56,13 +56,18 @@ Then(/^I should receive (exactly )?(\d+)(?: FIX|fix)? messages(?: (?:on|over) FI
     
     scope=messages.slice(0, count)
 
+    msgType = nil
     unless type.nil?
-      unless FIXSpec::data_dictionary.nil?
-        type = FIXSpec::data_dictionary.get_msg_type(type)
+      unless FIXSpec::session_data_dictionary.nil?
+        msgType = FIXSpec::session_data_dictionary.get_msg_type(type)
+      end
+
+      if msgType.nil? && !FIXSpec::application_data_dictionary.nil?
+        msgType = FIXSpec::application_data_dictionary.get_msg_type(type)
       end
 
       scope.each do |msg|
-        expect(msg[:message].header.get_string(35)).to eq(type)
+        expect(msg[:message].header.get_string(35)).to eq(msgType)
       end
     end
   end
