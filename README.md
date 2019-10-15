@@ -197,7 +197,7 @@ Please see the [contribution guidelines](CONTRIBUTION_GUIDELINES.md).
 Credits
 -------
 
-Contributers:
+Contributors:
 
 * [Chris Busbey](https://github.com/cbusbey)
 * Matt Lane
