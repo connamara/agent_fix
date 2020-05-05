@@ -203,7 +203,7 @@ Contributors:
 * Matt Lane
 * [Mike Gatny](https://github.com/mgatny)
 
-![Connamara Systems](http://www.connamara.com/wp-content/uploads/2016/01/connamara_logo_dark.png)
+![Connamara Systems](http://quickfixn.org/web/public/images/Connamara-Logo.png)
 
 agent_fix is maintained and funded by [Connamara Systems, llc](http://connamara.com).
 
