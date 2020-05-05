@@ -148,3 +148,26 @@ Then the FIX message should have the following:
   
   expect(found).to be(true), "Message not included in FIX messages\n #{error_accum}"
 end
+
+Then(/^the (?:fix|FIX) messages should include a message with(?: the tag)? "(.*)"$/) do |path|
+  expect(@message_scope).not_to be_nil, "No message scope defined"
+
+  found = false
+  error_accum = ""
+  index = 1
+  @message_scope.each do |m|
+    @message = m
+    begin
+      steps %Q{
+When I inspect the #{index}th FIX message
+And the FIX message should have "#{path}"
+      }
+      found = true
+    rescue Exception => e
+      error_accum << "\n#{m.to_s.gsub!(/\001/, '|')}\n #{e}"
+    end
+    index += 1
+  end
+
+  expect(found).to be(true), "Tag not included in FIX messages\n #{error_accum}"
+end
