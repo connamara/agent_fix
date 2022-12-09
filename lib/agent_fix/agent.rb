@@ -142,9 +142,13 @@ module AgentFIX
 
       @logger.info "Settings for #{@name}: #{session_settings}"
 
-      @storeFactory = quickfix.MemoryStoreFactory.new()
       @messageFactory = quickfix.DefaultMessageFactory.new()
       @settings = quickfix.SessionSettings.new( Java::java.io.ByteArrayInputStream.new(session_settings.to_java_bytes) )
+      if session_settings.include?("FileStorePath")
+        @storeFactory = quickfix.FileStoreFactory.new(@settings)
+      else
+        @storeFactory = quickfix.MemoryStoreFactory.new()
+      end
       @logFactory = quickfix.FileLogFactory.new(@settings)
     end
 
